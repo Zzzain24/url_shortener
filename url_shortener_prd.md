@@ -18,7 +18,7 @@ Build a fully functional URL shortener REST API from scratch in Go — no AI ass
 You're done when:
 
 - [ ] All three core endpoints work correctly
-- [ ] The database schema is written by hand and intentionally designed
+- [x] The database schema is written by hand and intentionally designed
 - [ ] All errors are handled — no unhandled panics, no silent failures
 - [ ] The server can be started fresh, used via curl, and behaves predictably
 - [ ] You can explain every line of code you wrote and why it's there
