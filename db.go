@@ -4,18 +4,47 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
+	"math/rand/v2"
     "database/sql"
-	"net/http"
 	"github.com/joho/godotenv"
-    _ "github.com/jackc/pgx/v5/stdlib"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-// POST function to insert new data into db
-func inserLink error () {
-	shortUrl := "https://localhost:8080"
+// character set for short_code
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
+func GenerateShortCode () string {
+	var code []byte
+	for i := 0; i < 6; i++ {
+		randomNum := rand.IntN(len(charset))
+		code = append(code, charset[randomNum]) 
+	}
 
+	return string(code)
+}
+
+func InsertLink (db *sql.DB, originalURL string) (string, error) {
+	// flag to check if generated short_code exists in db or not 
+	var exists bool
+	var shortCode string
+	for {
+		shortCode = GenerateShortCode()
+		err := db.QueryRow(
+			"SELECT EXISTS(SELECT 1 FROM url_data WHERE short_code = $1)",
+			shortCode,
+		).Scan(&exists)
+		// ensure query is clean
+		if err != nil {
+			return "", err
+		}
+		// exit loop if valid short_code is generated
+		if !exists {
+			break
+		}
+	}
+	// insert shortcode and url data
+	query := "INSERT INTO url_data () VALUES ()"
+	// return short_code or error
 }
 
 func main() {
@@ -38,6 +67,7 @@ func main() {
         log.Fatal(pingErr)
     }
     fmt.Println("Connected!")
+	fmt.Println(GenerateShortCode())
 }
 
 

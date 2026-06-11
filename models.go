@@ -28,5 +28,9 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
+type Application struct {
+    db *sql.DB
+}
+
 
 
