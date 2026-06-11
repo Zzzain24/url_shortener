@@ -4,14 +4,22 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
     "database/sql"
 	"net/http"
 	"github.com/joho/godotenv"
     _ "github.com/jackc/pgx/v5/stdlib"
 )
 
+// POST function to insert new data into db
+func inserLink error () {
+	shortUrl := "https://localhost:8080"
+
+
+}
+
 func main() {
-	// Load .env file and stop the program if there's an error
+	// load .env file and stop the program if there's an error
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
