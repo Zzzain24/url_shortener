@@ -43,8 +43,12 @@ func InsertLink (db *sql.DB, originalURL string) (string, error) {
 		}
 	}
 	// insert shortcode and url data
-	query := "INSERT INTO url_data () VALUES ()"
-	// return short_code or error
+	query := "INSERT INTO url_data (short_code, original_url) VALUES ($1, $2)"
+	_, err := db.Exec(query, shortCode, originalURL)
+	if err != nil{
+		return "", err
+	}
+	return shortCode, nil
 }
 
 func main() {
@@ -67,7 +71,6 @@ func main() {
         log.Fatal(pingErr)
     }
     fmt.Println("Connected!")
-	fmt.Println(GenerateShortCode())
 }
 
 

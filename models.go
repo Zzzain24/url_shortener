@@ -21,7 +21,6 @@ type Link struct {
 	OriginalURL: string
 	Clicks: int
 	CreatedAt: time.Time
-
 }
 
 type ErrorResponse struct {
