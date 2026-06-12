@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"errors"
 	"math/rand/v2"
     "database/sql"
 	"github.com/joho/godotenv"
@@ -51,6 +52,23 @@ func InsertLink (db *sql.DB, originalURL string) (string, error) {
 	return shortCode, nil
 }
 
+func GetOriginalURL (db *sql.DB, shortCode string) (string, error) {
+	var originalURL string
+	// use shortCode to query db for originalURL 
+	query := "SELECT original_url FROM url_data WHERE short_code = $1"
+	err := db.QueryRow(query, shortCode).Scan(&originalURL)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return "", ErrNotFound
+	}
+
+	if err != nil {
+		return "", err
+	}
+
+	return originalURL, nil
+}
+
 func main() {
 	// load .env file and stop the program if there's an error
 	err := godotenv.Load()
@@ -71,6 +89,7 @@ func main() {
         log.Fatal(pingErr)
     }
     fmt.Println("Connected!")
+	fmt.Println(GetOriginalURL(db, "PXKFpY"))
 }
 
 

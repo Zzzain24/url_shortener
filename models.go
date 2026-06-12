@@ -2,6 +2,8 @@ package main
 
 import (
 	"time"
+	"errors"
+	"database/sql"
 )
 
 type ShortenRequest struct {
@@ -17,10 +19,10 @@ type LinkResponse struct {
 }
 
 type Link struct {
-	ShortCode: string
-	OriginalURL: string
-	Clicks: int
-	CreatedAt: time.Time
+	ShortCode string
+	OriginalURL string
+	Clicks int
+	CreatedAt time.Time
 }
 
 type ErrorResponse struct {
@@ -30,6 +32,8 @@ type ErrorResponse struct {
 type Application struct {
     db *sql.DB
 }
+
+var ErrNotFound = errors.New("not found")
 
 
 
