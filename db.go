@@ -1,14 +1,9 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"os"
-	"errors"
-	"math/rand/v2"
     "database/sql"
-	"github.com/joho/godotenv"
-	_ "github.com/jackc/pgx/v5/stdlib"
+    "errors"
+    "math/rand/v2"
 )
 
 // character set for short_code
@@ -30,10 +25,8 @@ func InsertLink (db *sql.DB, originalURL string) (string, error) {
 	var shortCode string
 	for {
 		shortCode = GenerateShortCode()
-		err := db.QueryRow(
-			"SELECT EXISTS(SELECT 1 FROM url_data WHERE short_code = $1)",
-			shortCode,
-		).Scan(&exists)
+		query := "SELECT EXISTS(SELECT 1 FROM url_data WHERE short_code = $1)"
+		err := db.QueryRow(query, shortCode).Scan(&exists)
 		// ensure query is clean
 		if err != nil {
 			return "", err
@@ -78,27 +71,22 @@ func IncrementClicks (db *sql.DB, shortCode string) error {
 	return nil	
 }
 
-func main() {
-	// load .env file and stop the program if there's an error
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+func GetStats (db *sql.DB, shortCode string) (Link, error) {
+	// return Link object with short_code, original_url, short_url, clicks, created_at
+	var linkResponse Link
+	linkResponse.ShortCode = shortCode
+	query := "SELECT original_url, clicks, created_at FROM url_data WHERE short_code = $1"
+	err := db.QueryRow(query, shortCode).Scan(&linkResponse.OriginalURL, &linkResponse.Clicks, &linkResponse.CreatedAt)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return Link{}, ErrNotFound
 	}
 
-	connStr := os.Getenv("DATABASE_URL")
-    db, err := sql.Open("pgx", connStr)
-    if err != nil {
-        panic(err)
-    }
-	defer db.Close()
+	if err != nil {
+		return Link{}, err
+	}
 
-	// check if db is connected 
-	pingErr := db.Ping()
-    if pingErr != nil {
-        log.Fatal(pingErr)
-    }
-    fmt.Println("Connected!")
-	fmt.Println(GetOriginalURL(db, "PXKFpY"))
+	return linkResponse, nil
 }
 
 
