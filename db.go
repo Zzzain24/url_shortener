@@ -69,6 +69,15 @@ func GetOriginalURL (db *sql.DB, shortCode string) (string, error) {
 	return originalURL, nil
 }
 
+func IncrementClicks (db *sql.DB, shortCode string) error {
+	query := "UPDATE url_data SET clicks = clicks + 1 WHERE short_code = $1"
+	_, err := db.Exec(query, shortCode)
+	if err != nil {
+		return err
+	}
+	return nil	
+}
+
 func main() {
 	// load .env file and stop the program if there's an error
 	err := godotenv.Load()
