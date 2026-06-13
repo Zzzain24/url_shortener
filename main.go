@@ -5,9 +5,14 @@ import (
     "fmt"
     "log"
     "os"
+	"net/http"
     "github.com/joho/godotenv"
     _ "github.com/jackc/pgx/v5/stdlib"
 )
+
+type Application struct {
+    db *sql.DB
+}
 
 func main() {
 	// load .env file and stop the program if there's an error
@@ -29,4 +34,16 @@ func main() {
         log.Fatal(pingErr)
     }
     fmt.Println("Connected!")
+
+	// stores pointer to db connection 
+	app := &Application{db: db}
+
+	// create router
+	mux := http.NewServeMux()
+	mux.HandleFunc("POST /shorten", app.handleShorten)
+	log.Println("Server starting on :8080...")
+
+	if err := http.ListenAndServe(":8080", mux); err != nil {
+		log.Fatal(err)
+	}
 }

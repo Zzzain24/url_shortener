@@ -4,6 +4,7 @@ import (
     "database/sql"
     "errors"
     "math/rand/v2"
+	"time"
 )
 
 // character set for short_code
@@ -19,17 +20,18 @@ func GenerateShortCode () string {
 	return string(code)
 }
 
-func InsertLink (db *sql.DB, originalURL string) (string, error) {
+func InsertLink (db *sql.DB, originalURL string) (string, time.Time, error) {
 	// flag to check if generated short_code exists in db or not 
 	var exists bool
 	var shortCode string
+	var createdAt time.Time 
 	for {
 		shortCode = GenerateShortCode()
 		query := "SELECT EXISTS(SELECT 1 FROM url_data WHERE short_code = $1)"
 		err := db.QueryRow(query, shortCode).Scan(&exists)
 		// ensure query is clean
 		if err != nil {
-			return "", err
+			return "", time.Time{}, err
 		}
 		// exit loop if valid short_code is generated
 		if !exists {
@@ -37,12 +39,12 @@ func InsertLink (db *sql.DB, originalURL string) (string, error) {
 		}
 	}
 	// insert shortcode and url data
-	query := "INSERT INTO url_data (short_code, original_url) VALUES ($1, $2)"
-	_, err := db.Exec(query, shortCode, originalURL)
+	query := "INSERT INTO url_data (short_code, original_url) VALUES ($1, $2) RETURNING created_at"
+	err := db.QueryRow(query, shortCode, originalURL).Scan(&createdAt)
 	if err != nil{
-		return "", err
+		return "", time.Time{}, err
 	}
-	return shortCode, nil
+	return shortCode, createdAt, nil
 }
 
 func GetOriginalURL (db *sql.DB, shortCode string) (string, error) {

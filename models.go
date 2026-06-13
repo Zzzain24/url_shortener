@@ -3,7 +3,6 @@ package main
 import (
 	"time"
 	"errors"
-	"database/sql"
 )
 
 type ShortenRequest struct {
@@ -12,7 +11,7 @@ type ShortenRequest struct {
 
 type LinkResponse struct {
 	ShortCode string `json:"short_code"`
-	ShortUrl string `json:"short_url"`
+	ShortURL string `json:"short_url"`
 	OriginalURL string `json:"original_url"`
 	Clicks int `json:"clicks"`
 	CreatedAt time.Time `json:"created_at"`
@@ -27,10 +26,6 @@ type Link struct {
 
 type ErrorResponse struct {
 	Error string `json:"error"`
-}
-
-type Application struct {
-    db *sql.DB
 }
 
 var ErrNotFound = errors.New("not found")
